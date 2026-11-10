@@ -41,7 +41,7 @@ public class DatabaseSeeder {
             // 4. Seed 10 Complaints if repository has very few items (force refresh)
             if (complaintRepo.count() < 5) {
                 System.out.println("SEEDER: Database has few/no complaints. Seeding fresh complaints...");
-                seedComplaints(userRepo, complaintRepo);
+                seedComplaints(userRepo, complaintRepo, encoder);
             }
             
             System.out.println("SEEDER: Database check complete.");
@@ -199,7 +199,7 @@ public class DatabaseSeeder {
         });
     }
 
-    private void seedComplaints(UserRepository userRepo, ComplaintRepository complaintRepo) {
+    private void seedComplaints(UserRepository userRepo, ComplaintRepository complaintRepo, PasswordEncoder encoder) {
         User emp = userRepo.findByUsername("sahan").orElse(null); // Assuming Sahan was created elsewhere or exists
         // If sahan doesn't exist, try to find any employee
         if (emp == null) emp = userRepo.findByRole(User.Role.EMPLOYEE).stream().findFirst().orElse(null);
@@ -209,6 +209,7 @@ public class DatabaseSeeder {
             emp = new User();
             emp.setUsername("emp_sahan"); emp.setFullName("Sahan Perera"); emp.setRole(User.Role.EMPLOYEE);
             emp.setCompanyName("ABC Garments"); emp.setCompanyId(1L);
+            emp.setPassword(encoder.encode("Employee@123")); emp.setEnabled(true);
             emp = userRepo.save(emp);
         }
 
@@ -216,6 +217,7 @@ public class DatabaseSeeder {
         if (cust == null) {
             cust = new User();
             cust.setUsername("cust_kavindi"); cust.setFullName("Kavindi"); cust.setRole(User.Role.CUSTOMER);
+            cust.setEmail("kavindi@example.com"); cust.setPassword(encoder.encode("Customer@123")); cust.setEnabled(true);
             cust = userRepo.save(cust);
         }
 
